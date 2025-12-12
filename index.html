@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convite de Aniversário da Alice</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Fredoka+One&family=Nunito:wght@400;700;900&family=Patrick+Hand&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Cores para as diferentes fases do dia */
+            --day-bluey-light: #86C6F9; /* Azul claro (dia) */
+            --day-bluey-primary: #5AA9E6;
+            --day-bluey-medium: #3A8BD6;
+            --day-bluey-dark: #1E6BB8;
+            --sunset-bluey-light: #FF8C42; /* Laranja por do sol */
+            --sunset-bluey-primary: #FF6B35;
+            --night-bluey-light: #5A86C9; /* Azul escuro noite */
+            --night-bluey-primary: #3A5FA8;
+            
+            /* Cores comuns */
+            --bluey-accent: #FF9A3D;
+            --bluey-yellow: #FFD166;
+            --bluey-green: #7BD389;
+            --bluey-pink: #FF7BA9;
+            --bluey-purple: #C77DFF;
+            --text-light: #FFFFFF;
+            
+            /* Variáveis dinâmicas */
+            --current-light: var(--day-bluey-light);
+            --current-primary: var(--day-bluey-primary);
+            --current-medium: var(--day-bluey-medium);
+            --current-dark: var(--day-bluey-dark);
+            --current-background: linear-gradient(180deg, #86C6F9 0%, #5AA9E6 50%, #3A8BD6 100%);
+            --current-accent: var(--bluey-accent);
+            --sun-opacity: 1;
+            --moon-opacity: 0;
+            --stars-opacity: 0;
+            --clouds-opacity: 0.7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Comic Neue', cursive;
+            background: var(--current-background);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            line-height: 1.6;
+            transition: all 3s ease;
+        }
+
+        /* Céu com elementos */
+        .sky-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        /* Horizonte para o pôr do sol */
+        .horizon {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            background: linear-gradient(to top, 
+                rgba(255, 107, 53, 0.8) 0%,
+                rgba(255, 140, 66, 0.6) 20%,
+                rgba(255, 193, 102, 0.4) 40%,
+                rgba(134, 198, 249, 0.2) 70%,
+                transparent 100%
+            );
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        /* Nuvens */
+        .clouds {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: var(--clouds-opacity);
+            transition: opacity 2s ease;
+        }
+
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 100px;
+            animation: cloudFloat 60s infinite linear;
+            opacity: 0.4;
+        }
+
+        .cloud:before, .cloud:after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .cloud:nth-child(1) { 
+            width: 200px; 
+            height: 60px; 
+            top: 10%; 
+            left: -200px;
+            animation-delay: 0s;
+            animation-duration: 40s;
+        }
+        
+        .cloud:nth-child(2) { 
+            width: 150px; 
+            height: 45px; 
+            top: 30%; 
+            left: -150px;
+            animation-delay: 10s;
+            animation-duration: 50s;
+        }
+        
+        .cloud:nth-child(3) { 
+            width: 180px; 
+            height: 55px; 
+            top: 50%; 
+            left: -180px;
+            animation-delay: 20s;
+            animation-duration: 45s;
+        }
+
+        .cloud:nth-child(1):before, .cloud:nth-child(1):after {
+            width: 80px;
+            height: 80px;
+            top: -30px;
+        }
+        
+        .cloud:nth-child(1):before { left: 20px; }
+        .cloud:nth-child(1):after { left: 80px; }
+        
+        .cloud:nth-child(2):before, .cloud:nth-child(2):after {
+            width: 60px;
+            height: 60px;
+            top: -20px;
+        }
+        
+        .cloud:nth-child(2):before { left: 15px; }
+        .cloud:nth-child(2):after { left: 60px; }
+        
+        .cloud:nth-child(3):before, .cloud:nth-child(3):after {
+            width: 70px;
+            height: 70px;
+            top: -25px;
+        }
+        
+        .cloud:nth-child(3):before { left: 18px; }
+        .cloud:nth-child(3):after { left: 75px; }
+
+        /* Estrelas */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: var(--stars-opacity);
+            transition: opacity 2s ease;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: starTwinkle 4s infinite alternate;
+        }
+
+        /* Sol - VISÍVEL NO CANTO */
+        .sun-container {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            width: 100px;
+            height: 100px;
+            z-index: 2;
+            transform-origin: center;
+            transition: all 3s ease;
+        }
+
+        .sun {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #FFD166, #FF9A3D);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 40px #FF9A3D,
+                0 0 80px rgba(255, 154, 61, 0.5);
+            animation: sunGlow 4s infinite alternate ease-in-out;
+            opacity: var(--sun-opacity);
+            transition: all 3s ease;
+        }
+
+        .sun-rays {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 140px;
+            height: 140px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, transparent 30%, rgba(255, 209, 102, 0.3) 70%);
+            animation: sunPulse 3s infinite alternate;
+            transition: all 3s ease;
+        }
+
+        /* Lua - VISÍVEL NO CANTO */
+        .moon-container {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            width: 100px;
+            height: 100px;
+            z-index: 2;
+            transform-origin: center;
+            opacity: var(--moon-opacity);
+            transition: all 3s ease;
+        }
+
+        .moon {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #F0F8FF, #D4E6FF);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 40px #D4E6FF,
+                0 0 80px rgba(212, 230, 255, 0.5),
+                inset -10px -10px 20px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .moon-craters {
+            position: absolute;
+            top: 20%;
+            left: 30%;
+            width: 40%;
+            height: 60%;
+        }
+
+        .moon-crater {
+            position: absolute;
+            background: rgba(200, 220, 240, 0.3);
+            border-radius: 50%;
+        }
+
+        .moon-crater:nth-child(1) {
+            width: 20px;
+            height: 20px;
+            top: 10px;
+            left: 15px;
+        }
+
+        .moon-crater:nth-child(2) {
+            width: 15px;
+            height: 15px;
+            top: 30px;
+            left: 5px;
+        }
+
+        .moon-crater:nth-child(3) {
+            width: 25px;
+            height: 25px;
+            top: 40px;
+            left: 25px;
+        }
+
+        /* Bolinhas coloridas flutuantes */
+        .floating-dots {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .dot {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0;
+            animation: dotFloat 15s infinite linear;
+        }
+
+        /* Container Principal */
+        .main-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Cabeçalho */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .title-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .main-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2rem;
+            font-weight: 400;
+            color: white;
+            text-shadow: 
+                3px 3px 0 var(--current-accent),
+                6px 6px 0 rgba(0, 0, 0, 0.1);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            animation: bounce 2s infinite alternate;
+            transition: all 2s ease;
+        }
+
+        .subtitle {
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1.8rem;
+            color: var(--text-light);
+            margin-bottom: 25px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            transition: all 2s ease;
+        }
+
+        .birthday-elements {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .element-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .element-icon {
+            font-size: 2.2rem;
+            color: var(--bluey-yellow);
+            animation: bounceIcon 3s infinite ease-in-out;
+            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+            transition: all 2s ease;
+        }
+
+        .element-label {
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.9rem;
+            color: white;
+            font-weight: 700;
+            background-color: var(--current-accent);
+            padding: 3px 10px;
+            border-radius: 15px;
+            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+            transition: all 2s ease;
+        }
+
+        /* Card Principal */
+        .main-card {
+            background-color: white;
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.1),
+                0 5px 0 var(--current-accent),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 30px;
+            border: 8px solid var(--bluey-yellow);
+            transition: all 2s ease;
+        }
+
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 15px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--current-light),
+                var(--current-light) 20px,
+                var(--bluey-pink) 20px,
+                var(--bluey-pink) 40px
+            );
+            transition: all 2s ease;
+        }
+
+        /* Seção Sobre a Alice COM PERSONAGEM 1 AO LADO */
+        .about-alice-section {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .about-alice-container {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        @media (max-width: 768px) {
+            .about-alice-container {
+                flex-direction: column;
+            }
+        }
+
+        .section-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.2rem;
+            color: var(--current-medium);
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 2px 2px 0 var(--bluey-yellow);
+            transition: all 2s ease;
+        }
+
+        .about-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+            background-color: var(--current-light);
+            border-radius: 25px;
+            padding: 2rem;
+            border: 5px dashed var(--bluey-yellow);
+            position: relative;
+            overflow: hidden;
+            transition: all 2s ease;
+        }
+
+        @media (max-width: 768px) {
+            .about-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        .alice-avatar {
+            flex: 0 0 200px;
+            text-align: center;
+        }
+
+        .avatar-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--bluey-pink) 0%, var(--bluey-accent) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            border: 8px solid white;
+            box-shadow: 
+                0 10px 20px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 5px var(--bluey-yellow);
+            position: relative;
+            overflow: hidden;
+            transition: all 2s ease;
+        }
+
+        .avatar-circle::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: repeating-radial-gradient(circle at center, transparent, transparent 10px, rgba(255, 255, 255, 0.1) 10px, rgba(255, 255, 255, 0.1) 20px);
+            border-radius: 50%;
+            z-index: 1;
+            animation: rotate 20s infinite linear;
+        }
+
+        .avatar-circle i {
+            font-size: 5rem;
+            color: white;
+            z-index: 2;
+            position: relative;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .alice-name {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.8rem;
+            color: var(--current-medium);
+            margin-top: 1rem;
+            font-weight: 400;
+            transition: all 2s ease;
+        }
+
+        .alice-age {
+            font-family: 'Patrick Hand', cursive;
+            color: white;
+            font-weight: 700;
+            background-color: var(--bluey-pink);
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 5px;
+            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+            transition: all 2s ease;
+        }
+
+        .alice-details {
+            flex: 1;
+        }
+
+        .alice-details h3 {
+            font-family: 'Fredoka One', cursive;
+            color: var(--current-medium);
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            transition: all 2s ease;
+        }
+
+        .alice-details p {
+            font-family: 'Comic Neue', cursive;
+            font-size: 1.2rem;
+            line-height: 1.7;
+            color: var(--current-dark);
+            margin-bottom: 1.5rem;
+            transition: all 2s ease;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background-color: white;
+            border-radius: 15px;
+            border-left: 8px solid var(--bluey-yellow);
+            transition: all 0.3s;
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-item:hover {
+            transform: translateY(-5px) rotate(2deg);
+            box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-icon {
+            color: var(--current-accent);
+            font-size: 1.8rem;
+            min-width: 40px;
+            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+            transition: all 2s ease;
+        }
+
+        .detail-text {
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .detail-text strong {
+            display: block;
+            color: var(--current-medium);
+            font-size: 1rem;
+            margin-bottom: 3px;
+            transition: all 2s ease;
+        }
+
+        .detail-text p {
+            font-size: 0.9rem;
+            color: var(--current-dark);
+            margin-bottom: 0;
+            transition: all 2s ease;
+        }
+
+        /* Personagem ao lado da Alice - APENAS IMAGEM */
+        .character-side {
+            flex: 0 0 300px;
+            text-align: center;
+        }
+
+        .character-side h3 {
+            font-family: 'Fredoka One', cursive;
+            color: var(--current-medium);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            transition: all 2s ease;
+        }
+
+        .character-image {
+            width: 100%;
+            height: 400px;
+            border-radius: 20px;
+            object-fit: cover;
+            border: 5px solid var(--bluey-yellow);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .character-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Personagem entre seções - APENAS IMAGEM */
+        .character-between {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .character-between h3 {
+            font-family: 'Fredoka One', cursive;
+            color: var(--current-medium);
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            transition: all 2s ease;
+        }
+
+        .character-between-image {
+            width: 100%;
+            max-width: 400px;
+            height: 500px;
+            border-radius: 25px;
+            object-fit: cover;
+            border: 6px solid var(--bluey-pink);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+            margin: 0 auto;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .character-between-image:hover {
+            transform: rotate(2deg) scale(1.03);
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Carrossel de Fotos COM PERSONAGEM 2 */
+        .carousel-container {
+            margin: 2.5rem 0;
+            position: relative;
+        }
+
+        .carousel-with-character {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .carousel-with-character {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .carousel-wrapper {
+            background-color: white;
+            border-radius: 25px;
+            padding: 20px;
+            box-shadow: 
+                0 10px 25px rgba(0, 0, 0, 0.1),
+                0 5px 0 var(--bluey-green);
+            border: 5px solid var(--current-light);
+            transition: all 2s ease;
+        }
+
+        .carousel {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            height: 500px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #f0f8ff;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .slide-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--current-light), var(--current-primary));
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 2s ease;
+        }
+
+        .slide-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .slide-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .slide-placeholder h3 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.8rem;
+            color: white;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 0 var(--current-accent);
+            transition: all 2s ease;
+        }
+
+        .slide-placeholder p {
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1.2rem;
+            color: white;
+            margin-bottom: 1.5rem;
+            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .image-link-input {
+            width: 80%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 3px solid var(--bluey-yellow);
+            font-family: 'Comic Neue', cursive;
+            font-size: 1rem;
+            margin-top: 10px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            transition: all 2s ease;
+        }
+
+        .image-link-input:focus {
+            outline: none;
+            border-color: var(--current-accent);
+            box-shadow: 0 0 10px var(--current-accent);
+        }
+
+        /* Botões do carrossel */
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: var(--current-accent);
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            color: white;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+            font-family: 'Fredoka One', cursive;
+        }
+
+        .carousel-btn:hover {
+            background-color: var(--bluey-yellow);
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .carousel-btn.prev {
+            left: 20px;
+        }
+
+        .carousel-btn.next {
+            right: 20px;
+        }
+
+        .carousel-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 1.5rem;
+        }
+
+        .indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--current-light);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid white;
+            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .indicator.active {
+            background-color: var(--current-accent);
+            transform: scale(1.2);
+            box-shadow: 0 0 10px var(--current-accent);
+        }
+
+        /* Seção Favoritos */
+        .favorites-section {
+            margin: 3rem 0;
+        }
+
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .favorite-card {
+            background-color: white;
+            border-radius: 25px;
+            padding: 1.5rem;
+            border: 5px solid var(--current-light);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            box-shadow: 5px 5px 0 rgba(134, 198, 249, 0.3);
+        }
+
+        .favorite-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--bluey-pink), var(--current-accent), var(--bluey-yellow));
+            transition: all 2s ease;
+        }
+
+        .favorite-card:hover {
+            transform: translateY(-10px) rotate(2deg);
+            border-color: var(--bluey-yellow);
+            box-shadow: 10px 10px 0 rgba(134, 198, 249, 0.3);
+        }
+
+        .favorite-icon {
+            font-size: 3rem;
+            color: var(--current-accent);
+            margin-bottom: 1rem;
+            background-color: rgba(134, 198, 249, 0.2);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            border: 4px dotted var(--current-accent);
+            transition: all 2s ease;
+        }
+
+        .favorite-card h3 {
+            font-family: 'Fredoka One', cursive;
+            color: var(--current-medium);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+            transition: all 2s ease;
+        }
+
+        .favorite-card p {
+            font-family: 'Comic Neue', cursive;
+            color: var(--current-dark);
+            font-size: 1rem;
+            line-height: 1.5;
+            transition: all 2s ease;
+        }
+
+        /* Informações do Evento COM PERSONAGEM 3 */
+        .event-info {
+            margin: 2.5rem 0;
+            position: relative;
+        }
+
+        .event-with-character {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .event-with-character {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .info-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-card {
+            background-color: white;
+            border-radius: 25px;
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 8px solid var(--bluey-yellow);
+            transition: all 0.3s;
+            box-shadow: 5px 5px 0 rgba(134, 198, 249, 0.3);
+        }
+
+        .info-card:nth-child(2) {
+            border-top-color: var(--bluey-pink);
+        }
+        
+        .info-card:nth-child(3) {
+            border-top-color: var(--current-accent);
+        }
+
+        .info-card:hover {
+            transform: translateY(-8px) scale(1.03);
+        }
+
+        .info-icon {
+            font-size: 2.5rem;
+            color: var(--current-medium);
+            margin-bottom: 1rem;
+            transition: all 2s ease;
+        }
+
+        .info-card h4 {
+            font-family: 'Fredoka One', cursive;
+            color: var(--current-medium);
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+            transition: all 2s ease;
+        }
+
+        .info-card p {
+            font-family: 'Patrick Hand', cursive;
+            color: var(--current-dark);
+            font-size: 1.2rem;
+            transition: all 2s ease;
+        }
+
+        /* Mensagem de Convite COM PERSONAGEM 4 */
+        .invitation-message {
+            text-align: center;
+            padding: 3rem 2rem;
+            background-color: var(--current-light);
+            border-radius: 30px;
+            border: 8px solid var(--bluey-yellow);
+            margin-top: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 15px 30px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 5px white;
+            transition: all 2s ease;
+        }
+
+        .invitation-with-character {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .invitation-with-character {
+                flex-direction: column;
+            }
+        }
+
+        .invitation-content {
+            flex: 1;
+        }
+
+        .invitation-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 1.5rem;
+            text-shadow: 
+                3px 3px 0 var(--current-accent),
+                6px 6px 0 rgba(0, 0, 0, 0.1);
+            transition: all 2s ease;
+        }
+
+        .invitation-text {
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1.6rem;
+            line-height: 1.8;
+            color: white;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+            transition: all 2s ease;
+        }
+
+        .invitation-text strong {
+            color: var(--bluey-yellow);
+            transition: all 2s ease;
+        }
+
+        .invitation-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .invitation-icon {
+            font-size: 2.2rem;
+            color: white;
+            background-color: var(--current-accent);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .invitation-icon:hover {
+            transform: scale(1.2) rotate(15deg);
+            background-color: var(--bluey-yellow);
+            box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        /* Rodapé */
+        footer {
+            background-color: var(--current-medium);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 3rem;
+            border-top: 8px solid var(--bluey-yellow);
+            transition: all 2s ease;
+            z-index: 100;
+            position: relative;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .footer-icon {
+            font-size: 1.8rem;
+            color: var(--bluey-yellow);
+            transition: all 0.3s;
+            background-color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        #shareFooter {
+            cursor: pointer;
+        }
+
+        #shareFooter:hover {
+            transform: translateY(-5px) rotate(10deg) scale(1.1);
+            background-color: var(--current-accent);
+            color: white;
+        }
+
+        .footer-icon:hover {
+            color: var(--current-accent);
+            transform: translateY(-5px) rotate(10deg);
+            box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .footer-contact {
+            font-family: 'Comic Neue', cursive;
+            margin-top: 1rem;
+            font-size: 1rem;
+        }
+
+        .footer-contact i {
+            margin-right: 8px;
+        }
+
+        /* Modal para compartilhar - DO SEGUNDO CÓDIGO (funcional) */
+        .share-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999; /* Aumentado para garantir que fique acima de tudo */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-modal.active {
+            display: flex;
+        }
+
+        .share-modal-content {
+            background-color: white;
+            border-radius: 25px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            border: 8px solid var(--bluey-yellow);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .share-modal-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.8rem;
+            color: var(--current-medium);
+            margin-bottom: 1.5rem;
+            transition: all 2s ease;
+        }
+
+        .share-options {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .share-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 1rem;
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+
+        .share-option:hover {
+            background-color: rgba(134, 198, 249, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .share-option i {
+            font-size: 2.5rem;
+            color: var(--current-accent);
+            transition: all 2s ease;
+        }
+
+        .share-option span {
+            font-family: 'Comic Neue', cursive;
+            color: var(--current-dark);
+            font-size: 0.9rem;
+            transition: all 2s ease;
+        }
+
+        .share-link {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            border: 3px solid var(--current-light);
+            font-family: 'Comic Neue', cursive;
+            font-size: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+            background-color: #f5f9ff;
+            transition: all 2s ease;
+        }
+
+        .share-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .share-btn {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: none;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .share-btn.copy {
+            background-color: var(--current-accent);
+            color: white;
+        }
+
+        .share-btn.close {
+            background-color: var(--current-light);
+            color: white;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Animações */
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
+        }
+
+        @keyframes cloudFloat {
+            from { transform: translateX(0); }
+            to { transform: translateX(calc(100vw + 200px)); }
+        }
+
+        @keyframes dotFloat {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        @keyframes bounceIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes sunGlow {
+            0% { box-shadow: 0 0 40px #FF9A3D, 0 0 80px rgba(255, 154, 61, 0.5); }
+            100% { box-shadow: 0 0 60px #FFD166, 0 0 100px rgba(255, 209, 102, 0.7); }
+        }
+
+        @keyframes sunPulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+            100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.6; }
+        }
+
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* Responsividade */
+        @media (max-width: 992px) {
+            .main-title { font-size: 30px; }
+            .invitation-title { font-size: 2.2rem; }
+            .section-title { font-size: 2rem; }
+            .sun-container, .moon-container {
+                width: 80px;
+                height: 80px;
+                top: 20px;
+                right: 20px;
+            }
+            .moon-container {
+                left: 20px;
+            }
+            .sun-rays {
+                width: 110px;
+                height: 110px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-title { font-size: 2.5rem; }
+            .invitation-title { font-size: 2rem; }
+            .section-title { font-size: 1.8rem; }
+            .carousel { height: 400px; }
+            .details-grid { grid-template-columns: 1fr; }
+            .favorites-grid { grid-template-columns: 1fr; }
+            .birthday-elements { gap: 20px; }
+            .main-card, .carousel-wrapper, .character-side { padding: 20px; }
+            .about-content { padding: 1.5rem; }
+            .avatar-circle { width: 150px; height: 150px; }
+            .avatar-circle i { font-size: 4rem; }
+            .carousel-slide h3 { font-size: 1.5rem; }
+            .carousel-slide p { font-size: 1.1rem; }
+            .carousel-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+            .sun-container, .moon-container {
+                width: 70px;
+                height: 70px;
+                top: 15px;
+                right: 15px;
+            }
+            .moon-container {
+                left: 15px;
+            }
+            .sun-rays {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-title { font-size: 50px; }
+            .invitation-title { font-size: 1.8rem; }
+            .subtitle { font-size: 1.4rem; }
+            .invitation-icons { gap: 1rem; }
+            .invitation-icon { width: 60px; height: 60px; font-size: 1.8rem; }
+            .carousel { height: 350px; }
+            .carousel-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+            .carousel-btn.prev { left: 10px; }
+            .carousel-btn.next { right: 10px; }
+            .sun-container, .moon-container {
+                width: 60px;
+                height: 60px;
+                top: 10px;
+                right: 10px;
+            }
+            .moon-container {
+                left: 10px;
+            }
+            .sun-rays {
+                width: 90px;
+                height: 90px;
+            }
+        }
+        /* Estilos para os contatos no footer */
+.contact-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Comic Neue', cursive;
+    font-size: 1rem;
+}
+
+.contact-item i {
+    color: var(--bluey-yellow);
+    width: 20px;
+    text-align: center;
+}
+
+/* Responsividade para o footer */
+@media (max-width: 768px) {
+    .contact-wrapper {
+        align-items: center;
+        text-align: center;
+    }
+    
+    .contact-item {
+        flex-direction: column;
+        gap: 5px;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .contact-item i {
+        margin-bottom: 5px;
+    }
+}
+
+@media (max-width: 576px) {
+    .footer-contact p {
+        font-size: 1rem;
+        margin-bottom: 15px;
+    }
+    
+    .contact-item {
+        font-size: 0.9rem;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Céu com todos os elementos -->
+    <div class="sky-container">
+        <div class="horizon" id="horizon"></div>
+        <div class="clouds" id="clouds">
+            <div class="cloud"></div>
+            <div class="cloud"></div>
+            <div class="cloud"></div>
+        </div>
+        <div class="stars" id="stars"></div>
+    </div>
+
+    <!-- Sol - SEMPRE VISÍVEL NO CANTO -->
+    <div class="sun-container" id="sunContainer">
+        <div class="sun" id="sun">
+            <div class="sun-rays" id="sunRays"></div>
+        </div>
+    </div>
+
+    <!-- Lua - SEMPRE VISÍVEL NO CANTO -->
+    <div class="moon-container" id="moonContainer">
+        <div class="moon">
+            <div class="moon-craters">
+                <div class="moon-crater"></div>
+                <div class="moon-crater"></div>
+                <div class="moon-crater"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bolinhas coloridas -->
+    <div class="floating-dots" id="floatingDots"></div>
+
+    <!-- Conteúdo Principal -->
+    <div class="main-container">
+        <!-- Cabeçalho -->
+        <header class="header">
+            <div class="title-container">
+                <h1 class="main-title">FESTA DA ALICE!</h1>
+                <p class="subtitle">Uma celebração especial cheia de diversão e alegria!</p>
+            </div>
+
+            <div class="birthday-elements">
+                <div class="element-item">
+                    <div class="element-icon"><i class="fas fa-gamepad"></i></div>
+                    <div class="element-label">BRINCADEIRAS</div>
+                </div>
+                <div class="element-item">
+                    <div class="element-icon"><i class="fas fa-birthday-cake"></i></div>
+                    <div class="element-label">BOLO</div>
+                </div>
+                <div class="element-item">
+                    <div class="element-icon"><i class="fas fa-music"></i></div>
+                    <div class="element-label">MÚSICAS</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Card Principal -->
+        <div class="main-card">
+            <!-- Seção Sobre a Alice COM PERSONAGEM 1 AO LADO -->
+            <div class="about-alice-section">
+                <h2 class="section-title">Sobre a Alice</h2>
+                <div class="about-alice-container">
+                    <div class="about-content">
+                        <div class="alice-avatar">
+                            <div class="avatar-circle">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <h3 class="alice-name">Alice</h3>
+                            <div class="alice-age">Fazendo 2 anos!</div>
+                        </div>
+                        <div class="alice-details">
+                            <h3>Conheça a nossa aniversariante!</h3>
+                            <p>Alice é uma menina cheia de energia, criatividade e alegria! Ela adora brincar e passar tempo com a família e amigos. Seu sorriso ilumina qualquer lugar e sua imaginação não tem limites!</p>
+                            
+                            <div class="details-grid">
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-heart"></i>
+                                    </div>
+                                    <div class="detail-text">
+                                        <strong>Adora</strong>
+                                        <p>Brincar, desenhar e aprender coisas novas</p>
+                                    </div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-birthday-cake"></i>
+                                    </div>
+                                    <div class="detail-text">
+                                        <strong>Sonho</strong>
+                                        <p>Uma festa com todos os amigos e muitas brincadeiras</p>
+                                    </div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-gamepad"></i>
+                                    </div>
+                                    <div class="detail-text">
+                                        <strong>Brincadeira Favorita</strong>
+                                        <p>Correr e brincar o dia inteiro</p>
+                                    </div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-utensils"></i>
+                                    </div>
+                                    <div class="detail-text">
+                                        <strong>Comida Preferida</strong>
+                                        <p>Bolo de chocolate, sorvete e pipoca</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- PERSONAGEM 1 - Ao lado da seção Sobre a Alice -->
+                    <div class="character-side">
+                        <!-- COLE O LINK DA IMAGEM AQUI -->
+                        <img class="character-image" src="https://i.redd.it/hard-choice-time-bluey-or-bingo-you-can-only-pick-one-this-v0-f3b2fq0ex1id1.png?width=1402&format=png&auto=webp&s=bfa37f069401d937bb9bb5e4826c45426b47e89e" alt="Personagem Favorito 1">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PERSONAGEM 2 - Entre seções -->
+        <div class="character-between">
+            <!-- COLE O LINK DA IMAGEM AQUI -->
+            <img class="character-between-image" src="https://static.wikia.nocookie.net/blueypedia/images/f/f1/Bingo.png/revision/latest?cb=20240504232019&path-prefix=pt-br" alt="Personagem Favorito 2">
+        </div>
+
+        <!-- Carrossel de Fotos COM PERSONAGEM 3 -->
+        <section class="carousel-container">
+            <h2 class="section-title">Fotos da Alice</h2>
+            <div class="carousel-with-character">
+                <div class="carousel-wrapper">
+                    <div class="carousel">
+                        <div class="carousel-track" id="carouselTrack">
+                            <!-- Slide 1 - Espaço para link da foto -->
+                            <div class="carousel-slide" id="slide1">
+                                <div class="slide-placeholder">
+                                <img src="img/alice1.jpeg" alt="">
+                                </div>
+                            </div>
+                            <!-- Slide 2 - Espaço para link da foto -->
+                            <div class="carousel-slide" id="slide2">
+                                <div class="slide-placeholder">
+                                    <img src="img/alice2.jpeg" alt="">
+                                </div>
+                            </div>
+                            <!-- Slide 3 - Espaço para link da foto -->
+                            <div class="carousel-slide" id="slide3">
+                                <div class="slide-placeholder">
+                                    <img src="img/alice4.jpg" alt="">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Botões do carrossel -->
+                        <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
+                        <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="carousel-indicators">
+                        <div class="indicator active" data-slide="0"></div>
+                        <div class="indicator" data-slide="1"></div>
+                        <div class="indicator" data-slide="2"></div>
+                    </div>
+                </div>
+                
+                <!-- PERSONAGEM 3 - Ao lado do carrossel -->
+                <div class="character-side">
+                    <!-- COLE O LINK DA IMAGEM AQUI -->
+                    <img class="character-image" src="img/BlueyBingo.png" alt="Personagem Favorito 3">
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção Favoritos -->
+        <section class="favorites-section">
+            <h2 class="section-title">Coisas que a Alice Ama</h2>
+            <div class="favorites-grid">
+                <div class="favorite-card">
+                    <div class="favorite-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3>Artes</h3>
+                    <p>Adora pintar, desenhar e criar coisas coloridas! Sua imaginação não tem limites.</p>
+                </div>
+                <div class="favorite-card">
+                    <div class="favorite-icon">
+                        <i class="fas fa-drumstick-bite"></i>
+                    </div>
+                    <h3>Comida Preferida</h3>
+                    <p>Bolo de chocolate com morangos, pipoca, e suco de laranja. Ela sempre pede isso nas comemorações!</p>
+                </div>
+                <div class="favorite-card">
+                    <div class="favorite-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h3>Brincadeiras</h3>
+                    <p>Adora brincar de faz de conta, correr no parque e construir castelos com blocos de montar.</p>
+                </div>
+                <div class="favorite-card">
+                    <div class="favorite-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <h3>Música</h3>
+                    <p>Cantar e dançar são suas atividades favoritas. Ela adora músicas animadas!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Informações do Evento COM PERSONAGEM 4 -->
+        <section class="event-info">
+            <h2 class="section-title">Informações do Evento</h2>
+            <div class="event-with-character">
+                <div>
+                    <div class="info-cards">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <h4>Data</h4>
+                            <p>28 de Março</p>
+                        </div>
+                        
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <h4>Horário</h4>
+                            <p>13:30 às 17:00</p>
+                        </div>
+                        
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <h4>Local</h4>
+                            <p>Rua Mário Bastos 60</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PERSONAGEM 4 - Ao lado das informações do evento -->
+                <div class="character-side">
+                    <!-- COLE O LINK DA IMAGEM AQUI -->
+                    <img class="character-image" src="img/BlueyBingo2.png" alt="Personagem Favorito 4">
+                </div>
+            </div>
+        </section>
+
+        <!-- Mensagem de Convite -->
+        <section class="invitation-message">
+            <div class="invitation-with-character">
+                <div class="invitation-content">
+                    <h2 class="invitation-title">Contamos com sua presença!</h2>
+                    <p class="invitation-text">
+                        Sua presença é muito importante para tornar este dia ainda mais especial para a Alice! 
+                        <strong>Vamos juntos criar memórias inesquecíveis</strong> nesta celebração que foi preparada com muito carinho.
+                    </p>
+                    <p class="invitation-text">
+                        Cada amigo faz a diferença, e a Alice ficará muito feliz em compartilhar este momento especial com você!
+                    </p>
+                    
+                    <div class="invitation-icons">
+                        <div class="invitation-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="invitation-icon">
+                            <i class="fas fa-birthday-cake"></i>
+                        </div>
+                        <div class="invitation-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Rodapé -->
+    <!-- Rodapé -->
+<footer>
+    <div class="footer-content">
+        <p style="font-family: 'Patrick Hand', cursive; font-size: 1.2rem;">© 2026 Aniversário da Alice</p>
+        <div class="footer-icons">
+            <a href="mailto:raianeaparecida2810@gmail.com" class="footer-icon"><i class="fas fa-envelope"></i></a>
+            <a href="tel:+5511958098376" class="footer-icon"><i class="fas fa-phone"></i></a>
+        </div>
+        <div class="footer-contact">
+            <p>Caso Precisar de um site é só chamar:</p>
+            <div class="contact-wrapper">
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i> yagodias1404@gmail.com
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i> (11) 98883-4011
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <script>
+        // Inicializar elementos flutuantes
+        document.addEventListener('DOMContentLoaded', function() {
+            // Criar bolinhas coloridas
+            const dotsContainer = document.getElementById('floatingDots');
+            const colors = ['#86C6F9', '#FF9A3D', '#FFD166', '#FF7BA9', '#7BD389', '#C77DFF'];
+            
+            for (let i = 0; i < 30; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                
+                // Tamanhos variados
+                const size = Math.random() * 15 + 5;
+                dot.style.width = `${size}px`;
+                dot.style.height = `${size}px`;
+                
+                // Posição aleatória
+                dot.style.left = `${Math.random() * 100}%`;
+                
+                // Atraso na animação
+                dot.style.animationDelay = `${Math.random() * 15}s`;
+                
+                // Cores aleatórias
+                dot.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                dotsContainer.appendChild(dot);
+            }
+            
+            // Inicializar estrelas
+            function initializeStars() {
+                const starsContainer = document.getElementById('stars');
+                starsContainer.innerHTML = '';
+                
+                for (let i = 0; i < 100; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    
+                    // Tamanhos variados
+                    const size = Math.random() * 3 + 1;
+                    star.style.width = `${size}px`;
+                    star.style.height = `${size}px`;
+                    
+                    // Posição aleatória
+                    star.style.left = `${Math.random() * 100}%`;
+                    star.style.top = `${Math.random() * 100}%`;
+                    
+                    // Atraso na animação
+                    star.style.animationDelay = `${Math.random() * 4}s`;
+                    
+                    // Brilho variado
+                    star.style.opacity = Math.random() * 0.5 + 0.3;
+                    
+                    starsContainer.appendChild(star);
+                }
+            }
+            
+            initializeStars();
+            
+            // ============= SISTEMA SIMPLES E FUNCIONAL =============
+            const sun = document.getElementById('sun');
+            const sunRays = document.getElementById('sunRays');
+            const sunContainer = document.getElementById('sunContainer');
+            const moonContainer = document.getElementById('moonContainer');
+            const horizon = document.getElementById('horizon');
+            const clouds = document.getElementById('clouds');
+            const stars = document.getElementById('stars');
+            const root = document.documentElement;
+            
+            // Elementos para o carrossel
+            const track = document.querySelector('.carousel-track');
+            const nextButton = document.querySelector('.carousel-btn.next');
+            const prevButton = document.querySelector('.carousel-btn.prev');
+            const indicators = document.querySelectorAll('.indicator');
+            
+            let currentSlide = 0;
+            let isAnimating = false;
+            
+            // Função para mover carrossel
+            function moveToSlide(targetSlideIndex) {
+                if (isAnimating) return;
+                
+                isAnimating = true;
+                track.style.transform = `translateX(-${targetSlideIndex * 100}%)`;
+                currentSlide = targetSlideIndex;
+                
+                // Atualizar indicadores
+                indicators.forEach(indicator => indicator.classList.remove('active'));
+                document.querySelector(`.indicator[data-slide="${targetSlideIndex}"]`).classList.add('active');
+                
+                // Resetar flag de animação
+                setTimeout(() => {
+                    isAnimating = false;
+                }, 500);
+                
+                createBubbleEffect();
+            }
+            
+            // Botão próximo
+            nextButton.addEventListener('click', function() {
+                let nextIndex = (currentSlide + 1) % 3;
+                moveToSlide(nextIndex);
+            });
+            
+            // Botão anterior
+            prevButton.addEventListener('click', function() {
+                let prevIndex = (currentSlide - 1 + 3) % 3;
+                moveToSlide(prevIndex);
+            });
+            
+            // Indicadores
+            indicators.forEach(indicator => {
+                indicator.addEventListener('click', function() {
+                    const targetSlideIndex = parseInt(this.dataset.slide);
+                    if (targetSlideIndex !== currentSlide) {
+                        moveToSlide(targetSlideIndex);
+                    }
+                });
+            });
+            
+            // Auto-play do carrossel
+            let autoPlayInterval = setInterval(function() {
+                let nextIndex = (currentSlide + 1) % 3;
+                moveToSlide(nextIndex);
+            }, 5000);
+            
+            // Pausar auto-play ao interagir
+            track.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
+            track.addEventListener('mouseleave', () => {
+                autoPlayInterval = setInterval(function() {
+                    let nextIndex = (currentSlide + 1) % 3;
+                    moveToSlide(nextIndex);
+                }, 5000);
+            });
+            
+            // ============= SISTEMA DE CICLO DIA/NOITE SIMPLES =============
+            function updateDayCycle(scrollPercentage) {
+                // FASE 1: DIA (0% - 40% do scroll)
+                if (scrollPercentage <= 0.4) {
+                    const intensity = scrollPercentage / 0.4;
+                    
+                    // Cores do dia
+                    root.style.setProperty('--current-light', '#86C6F9');
+                    root.style.setProperty('--current-primary', '#5AA9E6');
+                    root.style.setProperty('--current-medium', '#3A8BD6');
+                    root.style.setProperty('--current-dark', '#1E6BB8');
+                    root.style.setProperty('--current-accent', '#FF9A3D');
+                    
+                    // Fundo do dia
+                    root.style.setProperty('--current-background', 
+                        `linear-gradient(180deg, 
+                            rgba(134, 198, 249, ${1 - intensity * 0.3}) 0%, 
+                            rgba(90, 169, 230, ${0.8 - intensity * 0.2}) 50%, 
+                            rgba(58, 139, 214, ${0.6 - intensity * 0.1}) 100%)`);
+                    
+                    // Sol visível
+                    root.style.setProperty('--sun-opacity', '1');
+                    root.style.setProperty('--moon-opacity', '0');
+                    
+                    // Sol fica mais baixo
+                    sunContainer.style.transform = `translateY(${intensity * 50}px) rotate(${intensity * 10}deg)`;
+                    sun.style.background = 'radial-gradient(circle, #FFD166, #FF9A3D)';
+                    sun.style.boxShadow = '0 0 40px #FF9A3D, 0 0 80px rgba(255, 154, 61, 0.5)';
+                    
+                    // Nuvens visíveis
+                    root.style.setProperty('--clouds-opacity', `${0.7 - intensity * 0.2}`);
+                    
+                    // Sem estrelas
+                    root.style.setProperty('--stars-opacity', '0');
+                    
+                    // Sem horizonte
+                    horizon.style.opacity = '0';
+                    
+                    // Sem efeito alaranjado
+                    document.body.style.filter = 'none';
+                }
+                
+                // FASE 2: PÔR DO SOL (40% - 60% do scroll)
+                else if (scrollPercentage <= 0.6) {
+                    const intensity = (scrollPercentage - 0.4) / 0.2;
+                    
+                    // Cores do pôr do sol
+                    root.style.setProperty('--current-light', '#FF8C42');
+                    root.style.setProperty('--current-primary', '#FF6B35');
+                    root.style.setProperty('--current-medium', '#E0552B');
+                    root.style.setProperty('--current-dark', '#C44C26');
+                    root.style.setProperty('--current-accent', '#FF6B35');
+                    
+                    // Fundo alaranjado
+                    root.style.setProperty('--current-background', 
+                        `linear-gradient(180deg, 
+                            rgba(255, 140, 66, ${0.3 + intensity * 0.7}) 0%, 
+                            rgba(255, 107, 53, ${0.2 + intensity * 0.6}) 50%, 
+                            rgba(224, 85, 43, ${0.1 + intensity * 0.5}) 100%)`);
+                    
+                    // Sol fica alaranjado e desce mais
+                    root.style.setProperty('--sun-opacity', '1');
+                    root.style.setProperty('--moon-opacity', '0');
+                    
+                    sunContainer.style.transform = `translateY(${50 + intensity * 200}px) rotate(${10 + intensity * 20}deg)`;
+                    sun.style.background = 'radial-gradient(circle, #FF8C42, #FF6B35)';
+                    sun.style.boxShadow = '0 0 40px #FF6B35, 0 0 80px rgba(255, 107, 53, 0.5)';
+                    
+                    // Nuvens diminuem
+                    root.style.setProperty('--clouds-opacity', `${0.5 - intensity * 0.3}`);
+                    
+                    // Sem estrelas ainda
+                    root.style.setProperty('--stars-opacity', '0');
+                    
+                    // Horizonte aparece
+                    horizon.style.opacity = `${intensity}`;
+                    
+                    // Efeito alaranjado na página
+                    document.body.style.filter = `sepia(${intensity * 0.3}) hue-rotate(${-intensity * 10}deg)`;
+                }
+                
+                // FASE 3: NOITE (60% - 100% do scroll)
+                else {
+                    const intensity = (scrollPercentage - 0.6) / 0.4;
+                    
+                    // Cores da noite
+                    root.style.setProperty('--current-light', '#5A86C9');
+                    root.style.setProperty('--current-primary', '#3A5FA8');
+                    root.style.setProperty('--current-medium', '#2A4F98');
+                    root.style.setProperty('--current-dark', '#1A3F88');
+                    root.style.setProperty('--current-accent', '#FFB347');
+                    
+                    // Fundo noturno
+                    root.style.setProperty('--current-background', 
+                        `linear-gradient(180deg, 
+                            rgba(26, 43, 92, ${0.5 + intensity * 0.5}) 0%, 
+                            rgba(15, 26, 58, ${0.7 + intensity * 0.3}) 100%)`);
+                    
+                    // Sol desaparece, lua aparece
+                    root.style.setProperty('--sun-opacity', `${1 - intensity}`);
+                    root.style.setProperty('--moon-opacity', `${intensity}`);
+                    
+                    sunContainer.style.transform = `translateY(${250 + intensity * 100}px) rotate(${30 + intensity * 20}deg)`;
+                    
+                    // Nuvens desaparecem
+                    root.style.setProperty('--clouds-opacity', `${0.2 - intensity * 0.2}`);
+                    
+                    // Estrelas aparecem
+                    root.style.setProperty('--stars-opacity', `${intensity * 0.8}`);
+                    
+                    // Horizonte desaparece
+                    horizon.style.opacity = `${1 - intensity}`;
+                    
+                    // Remove efeito alaranjado gradualmente
+                    document.body.style.filter = `sepia(${0.3 - intensity * 0.3}) hue-rotate(${-10 + intensity * 10}deg)`;
+                }
+            }
+            
+            // Função principal do scroll
+            function updateDayCycleOnScroll() {
+                const scrollPosition = window.scrollY;
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.body.scrollHeight;
+                const scrollPercentage = Math.min(scrollPosition / (documentHeight - windowHeight), 1);
+                
+                updateDayCycle(scrollPercentage);
+            }
+            
+            // Adicionar event listeners
+            window.addEventListener('scroll', updateDayCycleOnScroll);
+            window.addEventListener('resize', updateDayCycleOnScroll);
+            
+            // Inicializar ciclo do dia
+            updateDayCycleOnScroll();
+            
+            // Efeito de brilho no sol
+            setInterval(() => {
+                const sunOpacity = parseFloat(root.style.getPropertyValue('--sun-opacity') || 1);
+                if (sunOpacity > 0.1) {
+                    const hueRotate = Math.sin(Date.now() / 3000) * 5;
+                    const brightness = 0.9 + Math.sin(Date.now() / 2000) * 0.2;
+                    sun.style.filter = `hue-rotate(${hueRotate}deg) brightness(${brightness})`;
+                }
+            }, 100);
+            
+            // Efeito de brilho na lua
+            setInterval(() => {
+                const moonOpacity = parseFloat(root.style.getPropertyValue('--moon-opacity') || 0);
+                if (moonOpacity > 0.1) {
+                    const moon = document.querySelector('.moon');
+                    const brightness = 0.8 + Math.sin(Date.now() / 4000) * 0.2;
+                    moon.style.filter = `brightness(${brightness})`;
+                }
+            }, 100);
+            
+            // ============= SISTEMA DE COMPARTILHAMENTO DO SEGUNDO CÓDIGO =============
+            const shareModal = document.getElementById('shareModal');
+            const shareFooter = document.getElementById('shareFooter');
+            const closeModalBtn = document.getElementById('closeModal');
+            const copyLinkBtn = document.getElementById('copyLink');
+            const shareLinkInput = document.getElementById('shareLink');
+            
+            // Abrir modal ao clicar no ícone de compartilhar
+            shareFooter.addEventListener('click', function() {
+                shareModal.classList.add('active');
+                shareLinkInput.value = window.location.href;
+                createBubbleEffect();
+            });
+            
+            // Fechar modal
+            closeModalBtn.addEventListener('click', function() {
+                shareModal.classList.remove('active');
+            });
+            
+            // Copiar link
+            copyLinkBtn.addEventListener('click', function() {
+                shareLinkInput.select();
+                document.execCommand('copy');
+                
+                // Feedback visual
+                const originalText = copyLinkBtn.textContent;
+                copyLinkBtn.textContent = 'Link Copiado!';
+                copyLinkBtn.style.backgroundColor = '#7BD389';
+                
+                setTimeout(() => {
+                    copyLinkBtn.textContent = originalText;
+                    copyLinkBtn.style.backgroundColor = '';
+                }, 2000);
+                
+                createBubbleEffect();
+            });
+            
+            // Compartilhar no WhatsApp
+            document.getElementById('shareWhatsApp').addEventListener('click', function() {
+                const text = encodeURIComponent('Venha para o aniversário da Alice! 🎉🎂 Confira o convite: ');
+                const url = encodeURIComponent(window.location.href);
+                window.open(`https://wa.me/?text=${text}${url}`, '_blank');
+                shareModal.classList.remove('active');
+                createBubbleEffect();
+            });
+            
+            // Compartilhar no Facebook
+            document.getElementById('shareFacebook').addEventListener('click', function() {
+                const url = encodeURIComponent(window.location.href);
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+                shareModal.classList.remove('active');
+                createBubbleEffect();
+            });
+            
+            // Compartilhar no Twitter
+            document.getElementById('shareTwitter').addEventListener('click', function() {
+                const text = encodeURIComponent('Venha para o aniversário da Alice! 🎉🎂');
+                const url = encodeURIComponent(window.location.href);
+                window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+                shareModal.classList.remove('active');
+                createBubbleEffect();
+            });
+            
+            // Compartilhar no Instagram (simulação)
+            document.getElementById('shareInstagram').addEventListener('click', function() {
+                alert('Para compartilhar no Instagram, copie o link e cole no seu aplicativo!');
+                shareLinkInput.select();
+                document.execCommand('copy');
+                
+                const originalText = copyLinkBtn.textContent;
+                copyLinkBtn.textContent = 'Link Copiado!';
+                copyLinkBtn.style.backgroundColor = '#7BD389';
+                
+                setTimeout(() => {
+                    copyLinkBtn.textContent = originalText;
+                    copyLinkBtn.style.backgroundColor = '';
+                }, 2000);
+                
+                shareModal.classList.remove('active');
+                createBubbleEffect();
+            });
+            
+            // Fechar modal ao clicar fora
+            shareModal.addEventListener('click', function(e) {
+                if (e.target === shareModal) {
+                    shareModal.classList.remove('active');
+                }
+            });
+            
+            // Fechar modal com tecla ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && shareModal.classList.contains('active')) {
+                    shareModal.classList.remove('active');
+                }
+            });
+            // ============= FIM DO SISTEMA DE COMPARTILHAMENTO =============
+        });
+        
+        // Função para criar efeito de bolhas
+        function createBubbleEffect() {
+            const bubbleCount = 5;
+            
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.style.position = 'fixed';
+                bubble.style.width = '15px';
+                bubble.style.height = '15px';
+                bubble.style.borderRadius = '50%';
+                bubble.style.background = `radial-gradient(circle, var(--current-light), var(--current-primary))`;
+                bubble.style.left = `${Math.random() * 100}vw`;
+                bubble.style.top = `${Math.random() * 100}vh`;
+                bubble.style.pointerEvents = 'none';
+                bubble.style.zIndex = '100';
+                bubble.style.opacity = '0.8';
+                
+                document.body.appendChild(bubble);
+                
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 30 + Math.random() * 50;
+                
+                bubble.animate([
+                    { transform: 'translate(0, 0) scale(1)', opacity: 0.8 },
+                    { transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`, opacity: 0 }
+                ], {
+                    duration: 800 + Math.random() * 400,
+                    easing: 'ease-out'
+                });
+                
+                setTimeout(() => {
+                    if (bubble.parentNode) {
+                        bubble.parentNode.removeChild(bubble);
+                    }
+                }, 1200);
+            }
+        }
+        
+        // Função para carregar imagem no carrossel
+        function loadImage(slideNumber) {
+            const inputId = `imageLink${slideNumber}`;
+            const slideId = `slide${slideNumber}`;
+            const input = document.getElementById(inputId);
+            const slide = document.getElementById(slideId);
+            
+            const imageUrl = input.value.trim();
+            
+            if (!imageUrl) {
+                alert('Por favor, cole um link de imagem válido!');
+                return;
+            }
+            
+            if (!isValidUrl(imageUrl)) {
+                alert('Por favor, insira um link válido de imagem (deve começar com http:// ou https://)');
+                return;
+            }
+            
+            slide.innerHTML = '';
+            
+            const imgContainer = document.createElement('div');
+            imgContainer.style.width = '100%';
+            imgContainer.style.height = '100%';
+            imgContainer.style.position = 'relative';
+            imgContainer.style.overflow = 'hidden';
+            
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.alt = `Foto ${slideNumber} da Alice`;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            img.style.objectPosition = 'center';
+            img.style.borderRadius = '15px';
+            
+            const overlay = document.createElement('div');
+            overlay.style.position = 'absolute';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.background = 'linear-gradient(to top, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 30%)';
+            overlay.style.borderRadius = '15px';
+            overlay.style.pointerEvents = 'none';
+            
+            img.onload = function() {
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(overlay);
+                slide.appendChild(imgContainer);
+                
+                const revertBtn = document.createElement('button');
+                revertBtn.className = 'share-btn copy';
+                revertBtn.style.position = 'absolute';
+                revertBtn.style.bottom = '25px';
+                revertBtn.style.left = '50%';
+                revertBtn.style.transform = 'translateX(-50%)';
+                revertBtn.style.padding = '10px 20px';
+                revertBtn.style.zIndex = '20';
+                revertBtn.style.background = 'var(--current-accent)';
+                revertBtn.style.color = 'white';
+                revertBtn.style.border = 'none';
+                revertBtn.style.borderRadius = '25px';
+                revertBtn.style.fontFamily = "'Fredoka One', cursive";
+                revertBtn.style.fontSize = '1rem';
+                revertBtn.style.cursor = 'pointer';
+                revertBtn.style.boxShadow = '3px 3px 0 rgba(0, 0, 0, 0.3)';
+                revertBtn.style.transition = 'all 0.3s';
+                revertBtn.textContent = 'Alterar Foto';
+                revertBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    revertToPlaceholder(slideNumber);
+                };
+                
+                slide.appendChild(revertBtn);
+                
+                createBubbleEffect();
+                setTimeout(() => {
+                    alert('Foto carregada com sucesso!');
+                }, 300);
+            };
+            
+            img.onerror = function() {
+                alert('Não foi possível carregar a imagem. Verifique se o link está correto!\nDica: Use links diretos de imagens (terminam com .jpg, .png, .gif)');
+                revertToPlaceholder(slideNumber);
+            };
+            
+            const loader = document.createElement('div');
+            loader.style.position = 'absolute';
+            loader.style.top = '50%';
+            loader.style.left = '50%';
+            loader.style.transform = 'translate(-50%, -50%)';
+            loader.style.width = '50px';
+            loader.style.height = '50px';
+            loader.style.border = '5px solid var(--current-light)';
+            loader.style.borderTopColor = 'var(--current-accent)';
+            loader.style.borderRadius = '50%';
+            loader.style.animation = 'rotate 1s linear infinite';
+            imgContainer.appendChild(loader);
+            
+            slide.appendChild(imgContainer);
+        }
+        
+        function revertToPlaceholder(slideNumber) {
+            const slideId = `slide${slideNumber}`;
+            const slide = document.getElementById(slideId);
+            const inputId = `imageLink${slideNumber}`;
+            const input = document.getElementById(inputId);
+            
+            slide.innerHTML = `
+                <div class="slide-placeholder">
+                    <i class="fas fa-camera"></i>
+                    <h3>Foto ${slideNumber} da Alice</h3>
+                    <p>Adicione o link da foto ${slideNumber} da Alice no campo abaixo</p>
+                    <input type="text" class="image-link-input" placeholder="Cole o link da foto ${slideNumber} aqui" id="${inputId}" value="${input ? input.value : ''}">
+                    <button class="share-btn copy" style="margin-top: 10px; padding: 10px 20px;" onclick="loadImage(${slideNumber})">Carregar Foto</button>
+                </div>
+            `;
+        }
+        
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+    </script>
+</body>
+</html>
